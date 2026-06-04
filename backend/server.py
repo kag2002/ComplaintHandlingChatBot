@@ -165,16 +165,29 @@ async def list_runs():
         for f in sorted(d.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True):
             try:
                 data = json.loads(f.read_text(encoding="utf-8"))
+                summary = data.get("summary", {})
+                
+                # Adapt summary for GrabFood eval format compatibility with Day4 UI
+                if "accuracy" in summary or "total_cases" in summary:
+                    summary = {
+                        "passed_cases": summary.get("passed_cases", 0),
+                        "measured_cases": summary.get("total_cases", 0),
+                        "case_accuracy": summary.get("accuracy", 0.0),
+                        "tool_routing_accuracy": summary.get("accuracy", 0.0),
+                        "argument_accuracy": summary.get("accuracy", 0.0),
+                        "provider_error_cases": 0
+                    }
+                    
                 items.append({
                     "file": str(f.relative_to(ROOT)),
                     "run_id": data.get("run_id", f.stem),
-                    "version": data.get("version"),
+                    "version": data.get("version", "v1"),
                     "artifact_version": data.get("artifact_version"),
                     "suite": data.get("suite", "eval"),
                     "provider": data.get("provider"),
                     "model": data.get("model"),
-                    "generated_at": data.get("generated_at", data.get("summary", {}).get("run_at")),
-                    "summary": data.get("summary", {}),
+                    "generated_at": data.get("generated_at", summary.get("run_at")),
+                    "summary": summary,
                 })
             except Exception:
                 continue
@@ -212,7 +225,56 @@ async def log_detail(file: str):
         raise HTTPException(status_code=403, detail="Access denied")
     if not target.exists():
         raise HTTPException(status_code=404, detail="File not found")
-    return json.loads(target.read_text(encoding="utf-8"))
+        
+    data = json.loads(target.read_text(encoding="utf-8"))
+    
+    # If this is a GrabFood eval run file, adapt it for the frontend UI compatibility
+    if "results" in data and "summary" in data:
+        summary = data["summary"]
+        if "accuracy" in summary or "total_cases" in summary:
+            # Map summary
+            data["summary"] = {
+                "passed_cases": summary.get("passed_cases", 0),
+                "measured_cases": summary.get("total_cases", 0),
+                "case_accuracy": summary.get("accuracy", 0.0),
+                "tool_routing_accuracy": summary.get("accuracy", 0.0),
+                "argument_accuracy": summary.get("accuracy", 0.0),
+                "provider_error_cases": 0
+            }
+            # Map results items
+            adapted_results = []
+            for item in data.get("results", []):
+                # UI expects item.expect to show expected outputs
+                expect_obj = {
+                    "issue_type": item.get("expected", {}).get("issue_type"),
+                    "route_to": item.get("expected", {}).get("route_to"),
+                    "confidence": item.get("expected", {}).get("confidence")
+                }
+                
+                # Rebuild actual_tool_calls list from rounds or tool_events
+                actual_calls = []
+                for rd in item.get("rounds", []):
+                    for tc in rd.get("tool_calls", []):
+                        actual_calls.append({
+                            "name": tc.get("name"),
+                            "args": tc.get("args")
+                        })
+                
+                result_obj = {
+                    "passed": item.get("passed", False),
+                    "failures": item.get("failures", []),
+                    "actual_tool_calls": actual_calls
+                }
+                
+                adapted_results.append({
+                    "id": item.get("id"),
+                    "input": item.get("complaint"),
+                    "expect": expect_obj,
+                    "result": result_obj
+                })
+            data["results"] = adapted_results
+            
+    return data
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
