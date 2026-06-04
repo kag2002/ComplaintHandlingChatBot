@@ -1,6 +1,6 @@
 import React from 'react';
 import { Message } from '../../types/chat';
-import { Bot, User, Cpu, Clock, Layers } from 'lucide-react';
+import { Bot, User, Cpu, Clock, Layers, Coins } from 'lucide-react';
 import { formatTime } from '../../utils/format';
 
 interface ChatMessageProps {
@@ -44,7 +44,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
 
     boldParts.forEach((part, i) => {
       if (i % 2 === 1) {
-        elements.push(<strong key={`b-${i}`} className="font-semibold text-violet-400">{part}</strong>);
+        elements.push(<strong key={`b-${i}`} className="font-semibold text-emerald-400">{part}</strong>);
       } else {
         // Parse inline code inside plain text parts
         const codeParts = part.split(codeRegex);
@@ -70,13 +70,23 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const tokSec = showTelemetry ? ((message.total_tokens || 0) / ((message.latency_ms || 1) / 1000)).toFixed(1) : '0';
   const latencySec = showTelemetry ? ((message.latency_ms || 0) / 1000).toFixed(2) : '0';
 
+  // Cost calculation based on GPT-4o-mini OpenRouter pricing: Input: $0.15/1M tokens, Output: $0.60/1M tokens
+  const promptCost = (message.prompt_tokens || 0) * 0.00000015;
+  const completionCost = (message.completion_tokens || 0) * 0.00000060;
+  const totalCostUsd = promptCost + completionCost;
+  const totalCostVnd = totalCostUsd * 25000;
+  
+  const costDisplay = totalCostVnd < 0.1 
+    ? `$${totalCostUsd.toFixed(6)} (~${totalCostVnd.toFixed(3)}đ)` 
+    : `$${totalCostUsd.toFixed(5)} (~${totalCostVnd.toFixed(2)}đ)`;
+
   return (
     <div className={`flex w-full gap-4 py-4 px-4 transition-all duration-300 ${isBot ? 'bg-[#0f1422]/30 border-y border-slate-900/50' : 'bg-transparent'
       }`}>
       {/* Avatar Container */}
       <div className="flex-shrink-0">
         {isBot ? (
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 border border-violet-400/20 flex items-center justify-center text-white shadow-md shadow-violet-500/10">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 border border-emerald-400/20 flex items-center justify-center text-white shadow-md shadow-emerald-500/10">
             <Bot className="w-5 h-5" />
           </div>
         ) : (
@@ -91,7 +101,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         {/* Name and Time */}
         <div className="flex items-center gap-2 select-none">
           <span className="text-xs font-semibold text-slate-300">
-            {isBot ? 'EduTrace AI' : 'Bạn'}
+            {isBot ? 'GrabFood AI Agent' : 'Bạn'}
           </span>
           <span className="text-[10px] text-slate-500">
             {formatTime(message.timestamp)}
@@ -106,20 +116,25 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         {/* Telemetry Badge */}
         {showTelemetry && (
           <div className="flex flex-wrap gap-2 mt-3 select-none">
-            <div className="inline-flex items-center gap-3.5 px-3 py-1.5 bg-[#0b0f19]/80 border border-slate-800/80 text-[10px] text-slate-400 rounded-full font-mono shadow-sm">
+            <div className="inline-flex flex-wrap items-center gap-3 py-1.5 px-3 bg-[#0b0f19]/80 border border-slate-800/80 text-[10px] text-slate-400 rounded-2xl font-mono shadow-sm">
               <div className="flex items-center gap-1.5">
-                <Cpu className="w-3.5 h-3.5 text-violet-400 animate-pulse" />
+                <Cpu className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
                 <span><strong className="text-slate-200">{tokSec}</strong> tok/s</span>
               </div>
-              <div className="w-px h-2.5 bg-slate-800"></div>
+              <div className="w-px h-2.5 bg-slate-800 hidden sm:block"></div>
               <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                <Clock className="w-3.5 h-3.5 text-teal-400" />
                 <span><strong className="text-slate-200">{latencySec}</strong>s</span>
               </div>
-              <div className="w-px h-2.5 bg-slate-800"></div>
+              <div className="w-px h-2.5 bg-slate-800 hidden sm:block"></div>
               <div className="flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-cyan-400" />
                 <span><strong className="text-slate-200">{message.total_tokens}</strong> tokens</span>
+              </div>
+              <div className="w-px h-2.5 bg-slate-800 hidden sm:block"></div>
+              <div className="flex items-center gap-1.5 text-amber-400 font-semibold">
+                <Coins className="w-3.5 h-3.5 text-amber-400" />
+                <span>Chi phí: <strong className="text-amber-300">{costDisplay}</strong></span>
               </div>
             </div>
           </div>

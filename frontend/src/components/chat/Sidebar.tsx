@@ -18,6 +18,8 @@ export const Sidebar: React.FC = () => {
     toggleSidebar
   } = useChat();
 
+  const [isConfigOpen, setIsConfigOpen] = React.useState(false);
+
   if (!isSidebarOpen) return null;
 
   return (
@@ -25,10 +27,10 @@ export const Sidebar: React.FC = () => {
       {/* Sidebar Header */}
       <div className="p-4 border-b border-slate-800/60 flex items-center justify-between">
         <div className="flex items-center gap-2 select-none">
-          <div className="p-1.5 bg-violet-600/10 border border-violet-500/30 rounded-lg text-violet-400">
-            <Zap className="w-5 h-5 fill-violet-400/20" />
+          <div className="p-1.5 bg-emerald-600/10 border border-emerald-500/30 rounded-lg text-emerald-400">
+            <Zap className="w-5 h-5 fill-emerald-400/20" />
           </div>
-          <span className="font-semibold text-slate-100 text-sm tracking-wide uppercase">Research Agent</span>
+          <span className="font-semibold text-slate-100 text-sm tracking-wide uppercase">GrabFood Agent</span>
         </div>
         <button
           onClick={toggleSidebar}
@@ -107,17 +109,48 @@ export const Sidebar: React.FC = () => {
           className="flex items-center gap-2 px-3 py-2.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded-xl border border-slate-800/30 transition-all duration-300 select-none"
         >
           <FlaskConical className="w-4 h-4 text-cyan-400" />
-          <span>Log Viewer</span>
+          <span>Log Viewer & Evals</span>
         </Link>
-        <a
-          href="http://127.0.0.1:8000/api/health"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-2.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded-xl border border-slate-800/30 transition-all duration-300 select-none"
+        <button
+          onClick={() => setIsConfigOpen(!isConfigOpen)}
+          className={`flex items-center justify-between w-full px-3 py-2.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded-xl border border-slate-800/30 transition-all duration-300 select-none ${isConfigOpen ? 'bg-white/5 text-slate-200 border-emerald-500/20' : ''}`}
         >
-          <BarChart3 className="w-4 h-4 text-violet-400" />
-          <span>Thông tin cấu hình Agent</span>
-        </a>
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-emerald-400" />
+            <span>Cấu hình AI Agent</span>
+          </div>
+          <span className="text-[9px] opacity-60">{isConfigOpen ? '▼' : '▶'}</span>
+        </button>
+
+        {isConfigOpen && (
+          <div className="p-3 bg-gray-950/70 rounded-xl border border-slate-800/50 text-[10px] text-slate-400 space-y-2 select-text font-mono animate-fade-in shadow-inner">
+            <div className="flex justify-between border-b border-slate-900/60 pb-1">
+              <span>Model:</span>
+              <span className="text-slate-200">gpt-4o-mini</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-900/60 pb-1">
+              <span>Provider:</span>
+              <span className="text-slate-200">OpenRouter</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-900/60 pb-1">
+              <span>Latency TB:</span>
+              <span className="text-slate-200">~2.5s</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-900/60 pb-1">
+              <span>Tools:</span>
+              <span className="text-emerald-400 font-semibold">5 registered</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-900/60 pb-1">
+              <span>Policy:</span>
+              <span className="text-slate-200">Strict-Triage-V1</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Guardrails:</span>
+              <span className="text-amber-400 font-bold">Hoàn tiền/Đổ lỗi (Chặn)</span>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between text-[10px] text-slate-500 px-1 mt-1 select-none">
           <span>Trạng thái máy chủ:</span>
           <div className="flex items-center gap-1.5">
