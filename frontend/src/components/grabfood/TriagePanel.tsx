@@ -120,22 +120,24 @@ export default function TriagePanel({ triage }: TriagePanelProps) {
         </div>
 
         {/* Questions for stakeholders */}
-        {(triage.questions_to_customer.length > 0 || triage.questions_to_store.length > 0 || triage.questions_to_driver.length > 0) && (
+        {((triage.questions_to_customer?.length ?? 0) > 0 || 
+          (triage.questions_to_store?.length ?? 0) > 0 || 
+          (triage.questions_to_driver?.length ?? 0) > 0) && (
           <div className="space-y-2">
             <span className="text-gray-500 font-semibold block">Câu hỏi xác minh</span>
-            {triage.questions_to_customer.map((q, i) => (
+            {triage.questions_to_customer?.map((q, i) => (
               <div key={i} className="bg-gray-950/20 p-2 rounded border border-gray-800/40">
                 <span className="text-emerald-400 font-bold block mb-0.5">KHÁCH HÀNG:</span>
                 <span className="text-gray-300">{q}</span>
               </div>
             ))}
-            {triage.questions_to_store.map((q, i) => (
+            {triage.questions_to_store?.map((q, i) => (
               <div key={i} className="bg-gray-950/20 p-2 rounded border border-gray-800/40">
                 <span className="text-blue-400 font-bold block mb-0.5">CỬA HÀNG:</span>
                 <span className="text-gray-300">{q}</span>
               </div>
             ))}
-            {triage.questions_to_driver.map((q, i) => (
+            {triage.questions_to_driver?.map((q, i) => (
               <div key={i} className="bg-gray-950/20 p-2 rounded border border-gray-800/40">
                 <span className="text-purple-400 font-bold block mb-0.5">TÀI XẾ:</span>
                 <span className="text-gray-300">{q}</span>
