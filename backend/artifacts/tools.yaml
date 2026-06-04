@@ -1,0 +1,77 @@
+tools:
+  - name: clarify
+    description: "Yêu cầu khách hàng cung cấp thêm thông tin làm rõ khiếu nại (ví dụ: thiếu mã đơn hàng, thiếu mô tả chi tiết lỗi, hoặc cần xác nhận đồng ý chuyển CSKH)."
+    parameters:
+      type: object
+      properties:
+        question:
+          type: string
+          description: "Câu hỏi rõ ràng bằng tiếng Việt gửi tới khách hàng."
+        response_type:
+          type: string
+          enum: ["text", "yes_no"]
+          description: "Loại câu trả lời mong muốn: 'text' cho câu hỏi thông thường, 'yes_no' cho xác nhận Có/Không."
+        options:
+          type: array
+          items:
+            type: string
+          description: "Các tùy chọn gợi ý cho khách hàng lựa chọn (nếu có)."
+      required:
+        - question
+        - response_type
+
+  - name: order_lookup
+    description: "Tra cứu thông tin chi tiết đơn hàng (như tên quán, tên khách, danh sách món ăn, trạng thái giao hàng, v.v.) dựa trên mã đơn hàng order_id."
+    parameters:
+      type: object
+      properties:
+        order_id:
+          type: string
+          description: "Mã đơn hàng GrabFood (ví dụ: GF12345, GF67890, GF24680)."
+      required:
+        - order_id
+
+  - name: evidence_check
+    description: "Kiểm tra sự tồn tại và tính hợp lệ của các bằng chứng (ảnh khách chụp, hóa đơn cửa hàng, ảnh tài xế chụp lúc giao hàng, v.v.)."
+    parameters:
+      type: object
+      properties:
+        order_id:
+          type: string
+          description: "Mã đơn hàng cần kiểm tra bằng chứng."
+      required:
+        - order_id
+
+  - name: triage
+    description: "Chạy bộ máy phân loại khiếu nại (rule-based engine) để phân tích khiếu nại, xác định loại sự cố (issue_type), hướng xử lý (route_to), độ tin cậy (confidence) và tạo cấu trúc ticket sơ bộ."
+    parameters:
+      type: object
+      properties:
+        complaint_text:
+          type: string
+          description: "Nội dung khiếu nại đầy đủ của khách hàng."
+        order_data:
+          type: object
+          description: "Thông tin dữ liệu đơn hàng lấy từ order_lookup."
+      required:
+        - complaint_text
+        - order_data
+
+  - name: hitl_handoff
+    description: "Chuyển giao khiếu nại sang bộ phận CSKH (Human-in-the-Loop) để duyệt thủ công. Sử dụng khi confidence thấp hoặc liên quan đến bồi hoàn/tiền bạc."
+    parameters:
+      type: object
+      properties:
+        reason:
+          type: string
+          description: "Lý do cần chuyển CSKH (ví dụ: Cần xác nhận của cửa hàng, mâu thuẫn trạng thái giao hàng, khiếu nại bồi hoàn tiền)."
+        next_action:
+          type: string
+          description: "Hành động tiếp theo cần thực hiện (ví dụ: ask_store_to_confirm_packing, customer_support_review_delivery_conflict)."
+        ticket_details:
+          type: object
+          description: "Thông tin chi tiết ticket phân loại được từ triage."
+      required:
+        - reason
+        - next_action
+        - ticket_details

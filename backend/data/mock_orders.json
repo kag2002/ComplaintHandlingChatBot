@@ -1,0 +1,60 @@
+[
+  {
+    "order_id": "GF12345",
+    "order_status": "delivered",
+    "payment_status": "paid",
+    "driver_status": "delivered",
+    "delivery_status": "delivered",
+    "merchant_name": "Cơm Gà Tân Bình",
+    "customer_name": "Minh Anh",
+    "items": [
+      { "name": "Cơm gà", "quantity": 1 },
+      { "name": "Trà sữa trân châu", "quantity": 1 },
+      { "name": "Khoai tây chiên", "quantity": 1 }
+    ],
+    "evidence": {
+      "customer_photo": true,
+      "receipt_photo": true,
+      "driver_dropoff_photo": true,
+      "merchant_receipt_match": true
+    }
+  },
+  {
+    "order_id": "GF67890",
+    "order_status": "delivered",
+    "payment_status": "paid",
+    "driver_status": "delivered",
+    "delivery_status": "delivered",
+    "merchant_name": "Bún Bò Huế An Hòa",
+    "customer_name": "Gia Huy",
+    "items": [
+      { "name": "Bún bò", "quantity": 1 },
+      { "name": "Trà đá", "quantity": 1 }
+    ],
+    "evidence": {
+      "customer_photo": false,
+      "receipt_photo": false,
+      "driver_dropoff_photo": true,
+      "merchant_receipt_match": false
+    }
+  },
+  {
+    "order_id": "GF24680",
+    "order_status": "delivered",
+    "payment_status": "paid",
+    "driver_status": "delivered",
+    "delivery_status": "not_received_claim",
+    "merchant_name": "Mì Ý Corner",
+    "customer_name": "Hoàng Nam",
+    "items": [
+      { "name": "Mì Ý bò bằm", "quantity": 1 },
+      { "name": "Súp nấm", "quantity": 1 }
+    ],
+    "evidence": {
+      "customer_photo": false,
+      "receipt_photo": true,
+      "driver_dropoff_photo": false,
+      "merchant_receipt_match": true
+    }
+  }
+]

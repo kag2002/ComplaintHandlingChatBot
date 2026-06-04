@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+.next/
+out/
+build/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.venv/
+.env/
+
+# Logs & Runtime Transcripts (ignore local runs/transcripts)
+backend/transcripts/*.json
+backend/runs/*.json
+!backend/transcripts/.gitkeep
+!backend/runs/.gitkeep
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
