@@ -109,7 +109,7 @@ export const Sidebar: React.FC = () => {
           className="flex items-center gap-2 px-3 py-2.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded-xl border border-slate-800/30 transition-all duration-300 select-none"
         >
           <FlaskConical className="w-4 h-4 text-cyan-400" />
-          <span>Log Viewer & Evals</span>
+          <span>Monitoring</span>
         </Link>
         <button
           onClick={() => setIsConfigOpen(!isConfigOpen)}

@@ -54,3 +54,58 @@ export async function fetchLogDetail(file: string): Promise<any> {
   return res.json();
 }
 
+export interface ToolParamProperty {
+  type: string;
+  description?: string;
+  enum?: string[];
+}
+
+export interface ToolParameter {
+  type: string;
+  properties?: Record<string, ToolParamProperty>;
+  required?: string[];
+}
+
+export interface ToolDeclaration {
+  name: string;
+  description: string;
+  parameters: ToolParameter;
+}
+
+export interface GuardrailsResponse {
+  guardrails: string;
+  system_prompt: string;
+}
+
+export interface TestCaseExpected {
+  issue_type: string;
+  route_to: string;
+  confidence: string;
+}
+
+export interface TestCase {
+  id: string;
+  name: string;
+  orderId: string;
+  complaint: string;
+  expected: TestCaseExpected;
+}
+
+export async function fetchMonitoringTools(): Promise<ToolDeclaration[]> {
+  const res = await fetch(`${API_BASE}/api/monitoring/tools`, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`Failed to fetch monitoring tools: ${res.status}`);
+  return res.json();
+}
+
+export async function fetchMonitoringGuardrails(): Promise<GuardrailsResponse> {
+  const res = await fetch(`${API_BASE}/api/monitoring/guardrails`, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`Failed to fetch monitoring guardrails: ${res.status}`);
+  return res.json();
+}
+
+export async function fetchMonitoringTestCases(): Promise<TestCase[]> {
+  const res = await fetch(`${API_BASE}/api/monitoring/test-cases`, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`Failed to fetch monitoring test cases: ${res.status}`);
+  return res.json();
+}
+

@@ -276,6 +276,49 @@ async def log_detail(file: str):
             
     return data
 
+@app.get("/api/monitoring/tools")
+async def get_monitoring_tools():
+    """Retrieve the declared tools."""
+    tools_path = ROOT / "artifacts" / "tools.yaml"
+    if not tools_path.exists():
+        return []
+    import yaml
+    try:
+        data = yaml.safe_load(tools_path.read_text(encoding="utf-8"))
+        return data.get("tools", [])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi đọc tools: {str(e)}")
+
+@app.get("/api/monitoring/guardrails")
+async def get_monitoring_guardrails():
+    """Retrieve the system prompt and guardrails."""
+    system_prompt_path = ROOT / "artifacts" / "system_prompt.md"
+    if not system_prompt_path.exists():
+        return {"guardrails": "", "system_prompt": ""}
+    try:
+        text = system_prompt_path.read_text(encoding="utf-8")
+        import re
+        match = re.search(r"(### 2\. QUY TẮC AN TOÀN.*)(### 3\. VÍ DỤ)", text, re.DOTALL)
+        guardrails = match.group(1).strip() if match else text
+        return {
+            "guardrails": guardrails,
+            "system_prompt": text
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi đọc guardrails: {str(e)}")
+
+@app.get("/api/monitoring/test-cases")
+async def get_monitoring_test_cases():
+    """Retrieve evaluation test cases."""
+    eval_cases_path = ROOT / "data" / "eval_cases.json"
+    if not eval_cases_path.exists():
+        return []
+    try:
+        with open(eval_cases_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi đọc test cases: {str(e)}")
+
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     start_time = time.time()
